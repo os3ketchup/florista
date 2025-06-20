@@ -1,21 +1,13 @@
-import 'dart:io';
 import 'package:dotenv/dotenv.dart';
-import 'package:e_florista_bot/bot.dart';
 
+import '../lib/bot.dart';
 
 Future<void> main() async {
-  String? token;
+  final env = DotEnv()..load();
+  final token = env['BOT_TOKEN'];
 
-  // ✅ Use .env only if running locally
-  if (Platform.environment.containsKey('RAILWAY_ENVIRONMENT')) {
-    token = Platform.environment['BOT_TOKEN'];
-  } else {
-    final env = DotEnv()..load();
-    token = env['BOT_TOKEN'];
-  }
-
-  if (token == null || token.isEmpty) {
-    print('❌ BOT_TOKEN not found.');
+  if (token == null) {
+    print('❌ BOT_TOKEN not found in environment.');
     return;
   }
 
