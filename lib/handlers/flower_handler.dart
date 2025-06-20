@@ -32,10 +32,9 @@ void registerFlowerHandler(TeleDart bot) {
 
     for (var flower in selectedFlowers) {
       try {
-        await bot.sendPhoto(
+        bot.sendMessage(
           chatId,
-          flower.imageUrl,
-          caption: '''
+          '''
 🌸 *${flower.name}*
 💬 ${flower.description}
 💰 ${flower.price} UZS
@@ -50,6 +49,7 @@ void registerFlowerHandler(TeleDart bot) {
             ],
           ]),
         );
+
       } catch (e) {
         print('❌ Failed to send photo for ${flower.name}: $e');
         await bot.sendMessage(chatId, '⚠️ Could not load image for ${flower.name}');
