@@ -1,8 +1,8 @@
 import 'package:dotenv/dotenv.dart';
-import 'package:e_florista_bot/bot.dart';
 
+import '../lib/bot.dart';
 
-Future<void> startApps() async {
+Future<void> main() async {
   final env = DotEnv()..load();
   final token = env['BOT_TOKEN'];
 
