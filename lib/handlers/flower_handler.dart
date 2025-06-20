@@ -22,6 +22,9 @@ void registerFlowerHandler(TeleDart bot) {
 
     if (chatId == null || data == null) return;
 
+    // ✅ Answer callback immediately
+    bot.answerCallbackQuery(query.id);
+
     final selectedFlowers = allFlowers.where((f) => f.type == data).toList();
 
     for (var flower in selectedFlowers) {
@@ -44,7 +47,6 @@ void registerFlowerHandler(TeleDart bot) {
         ]),
       );
     }
-
-    bot.answerCallbackQuery(query.id);
   });
+
 }

@@ -30,8 +30,12 @@ void registerOrderHandler(TeleDart bot) {
       _userState[userId] = 'awaiting_name';
       bot.sendMessage(chatId, '👤 What is your *full name*?', parseMode: 'Markdown');
       bot.answerCallbackQuery(query.id);
+    } else {
+      // ✅ fallback for unknown buttons (optional)
+      bot.answerCallbackQuery(query.id, text: '❓ Unknown action');
     }
   });
+
 
   // Handle /cart command
   bot.onCommand('cart').listen((message) {
