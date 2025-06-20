@@ -1,5 +1,22 @@
-// import 'package:e_florista_bot/e_florista_bot.dart';
-//
-// void main() {
-//   startApp();
-// }
+
+
+import 'package:dotenv/dotenv.dart';
+import 'package:e_florista_bot/bot.dart';
+
+void main() async{
+  startApps();
+}
+
+
+
+Future<void> startApps() async {
+  final env = DotEnv()..load();
+  final token = env['BOT_TOKEN'];
+
+  if (token == null) {
+    print('❌ BOT_TOKEN not found in environment.');
+    return;
+  }
+
+  await startBot(token);
+}

@@ -1,4 +1,5 @@
 release: dart pub get
-start: dart bin/main.dart
+start: dart bin/e_florista_bot.dart
+
 
 
