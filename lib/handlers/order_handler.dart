@@ -13,6 +13,9 @@ void registerOrderHandler(TeleDart bot) {
 
     if (chatId == null || data == null) return;
 
+    // ✅ Ignore if it's flower type like "indoor" or "outdoor"
+    if (data == 'indoor' || data == 'outdoor') return;
+
     if (data.startsWith('add_')) {
       final flowerId = data.substring(4);
       Cart.addToCart(userId, flowerId);
@@ -30,10 +33,11 @@ void registerOrderHandler(TeleDart bot) {
       bot.answerCallbackQuery(query.id);
       bot.sendMessage(chatId, '👤 What is your *full name*?', parseMode: 'Markdown');
     } else {
-      // ❗️Fallback if unknown callback (but not indoor/outdoor — handled elsewhere)
+      // Fallback for other unknown actions
       bot.answerCallbackQuery(query.id, text: '❓ Unknown action');
     }
   });
+
 
   bot.onCommand('cart').listen((message) {
     final userId = message.from?.id;
