@@ -14,9 +14,16 @@ Your personal flower shop – fast, fresh, and full of love 💐
 ▫️ Outdoor 🌼
 
 Type /flowers to start choosing!
-
 ''',
       parseMode: 'Markdown',
+      replyMarkup: ReplyKeyboardMarkup(
+        keyboard: [
+          [KeyboardButton(text: '/flowers')],
+          [KeyboardButton(text: '/cart')],
+        ],
+        resizeKeyboard: true,
+        oneTimeKeyboard: false,
+      ),
     );
   });
 }
