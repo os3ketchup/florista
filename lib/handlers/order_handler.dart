@@ -3,10 +3,9 @@ import 'package:teledart/model.dart';
 import '../models/cart.dart';
 import '../utils/flower_data.dart';
 
-final Map<int, String> _userState = {}; // Stores user flow: name, contact, location
+final Map<int, String> _userState = {}; // Tracks user order state
 
 void registerOrderHandler(TeleDart bot) {
-  // Handle Add to Cart, Remove from Cart, Confirm Order, Clear Cart
   bot.onCallbackQuery().listen((query) {
     final userId = query.from.id;
     final chatId = query.message?.chat.id;
@@ -28,16 +27,14 @@ void registerOrderHandler(TeleDart bot) {
       bot.sendMessage(chatId, '🛒 Your cart is now empty.');
     } else if (data == 'confirm_order') {
       _userState[userId] = 'awaiting_name';
-      bot.sendMessage(chatId, '👤 What is your *full name*?', parseMode: 'Markdown');
       bot.answerCallbackQuery(query.id);
+      bot.sendMessage(chatId, '👤 What is your *full name*?', parseMode: 'Markdown');
     } else {
-      // ✅ fallback for unknown buttons (optional)
+      // ❗️Fallback if unknown callback (but not indoor/outdoor — handled elsewhere)
       bot.answerCallbackQuery(query.id, text: '❓ Unknown action');
     }
   });
 
-
-  // Handle /cart command
   bot.onCommand('cart').listen((message) {
     final userId = message.from?.id;
     final chatId = message.chat.id;
@@ -45,7 +42,6 @@ void registerOrderHandler(TeleDart bot) {
     if (userId == null) return;
 
     final flowerIds = Cart.getCart(userId);
-
     if (flowerIds.isEmpty) {
       bot.sendMessage(chatId, '🛒 Your cart is empty.');
       return;
@@ -67,68 +63,47 @@ void registerOrderHandler(TeleDart bot) {
       details,
       parseMode: 'Markdown',
       replyMarkup: InlineKeyboardMarkup(inlineKeyboard: [
-        [
-          InlineKeyboardButton(text: '🧹 Clear Cart', callbackData: 'clear_cart'),
-        ],
-        [
-          InlineKeyboardButton(text: '✅ Proceed to Order', callbackData: 'confirm_order'),
-        ],
+        [InlineKeyboardButton(text: '🧹 Clear Cart', callbackData: 'clear_cart')],
+        [InlineKeyboardButton(text: '✅ Proceed to Order', callbackData: 'confirm_order')],
       ]),
     );
   });
 
-  // Handle name, contact, and location input flow
   bot.onMessage().listen((message) {
     final userId = message.from?.id;
     final chatId = message.chat.id;
-
     if (userId == null) return;
 
     final state = _userState[userId];
     final orderInfo = Cart.getOrderInfo(userId);
 
-    // 🧑 Handle contact
     if (message.contact != null) {
       orderInfo.phone = message.contact!.phoneNumber;
       _userState[userId] = 'awaiting_location';
-
-      bot.sendMessage(
-        chatId,
-        '📍 Please enter your *delivery address*:',
-        parseMode: 'Markdown',
-        replyMarkup: ReplyKeyboardRemove(removeKeyboard: true), // remove contact keyboard
-      );
+      bot.sendMessage(chatId, '📍 Please enter your *delivery address*:', parseMode: 'Markdown', replyMarkup: ReplyKeyboardRemove(removeKeyboard: true));
       return;
     }
 
     final text = message.text;
     if (text == null) return;
 
-    // 👤 Full name
     if (state == 'awaiting_name') {
       orderInfo.name = text;
       _userState[userId] = 'awaiting_contact';
-
       bot.sendMessage(
         chatId,
         '📱 Please *share your phone number*:',
         parseMode: 'Markdown',
         replyMarkup: ReplyKeyboardMarkup(
-          keyboard: [
-            [KeyboardButton(text: '📞 Share Phone Number', requestContact: true)]
-          ],
+          keyboard: [[KeyboardButton(text: '📞 Share Phone Number', requestContact: true)]],
           resizeKeyboard: true,
           oneTimeKeyboard: true,
         ),
       );
-    }
-
-    // 📍 Delivery address
-    else if (state == 'awaiting_location') {
+    } else if (state == 'awaiting_location') {
       orderInfo.location = text;
       _userState.remove(userId);
 
-      // Compose order summary
       final flowerIds = Cart.getCart(userId);
       int total = 0;
       String items = '';

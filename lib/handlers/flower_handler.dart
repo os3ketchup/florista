@@ -3,6 +3,7 @@ import 'package:teledart/model.dart';
 import '../utils/flower_data.dart';
 
 void registerFlowerHandler(TeleDart bot) {
+  // /flowers command shows flower category buttons
   bot.onCommand('flowers').listen((message) {
     bot.sendMessage(
       message.chat.id,
@@ -16,14 +17,16 @@ void registerFlowerHandler(TeleDart bot) {
     );
   });
 
+  // Handle flower type button clicks (indoor / outdoor)
   bot.onCallbackQuery().listen((query) {
     final data = query.data;
     final chatId = query.message?.chat.id;
 
+    // Filter only indoor/outdoor category
     if (chatId == null || data == null) return;
+    if (data != 'indoor' && data != 'outdoor') return;
 
-    // ✅ Answer callback immediately
-    bot.answerCallbackQuery(query.id);
+    bot.answerCallbackQuery(query.id); // ✅ Respond immediately
 
     final selectedFlowers = allFlowers.where((f) => f.type == data).toList();
 
@@ -48,5 +51,4 @@ void registerFlowerHandler(TeleDart bot) {
       );
     }
   });
-
 }
