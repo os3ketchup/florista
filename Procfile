@@ -1,2 +1,2 @@
 release: dart pub get
-start: dart bin/main.dart
+start: dart lib/bot.dart
