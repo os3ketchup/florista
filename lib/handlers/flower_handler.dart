@@ -18,7 +18,7 @@ void registerFlowerHandler(TeleDart bot) {
   });
 
   // Handle flower type button clicks (indoor / outdoor)
-  bot.onCallbackQuery().listen((query) {
+  bot.onCallbackQuery().listen((query)async {
     final data = query.data;
     final chatId = query.message?.chat.id;
 
@@ -31,24 +31,30 @@ void registerFlowerHandler(TeleDart bot) {
     final selectedFlowers = allFlowers.where((f) => f.type == data).toList();
 
     for (var flower in selectedFlowers) {
-      bot.sendPhoto(
-        chatId,
-        flower.imageUrl,
-        caption: '''
+      try {
+        await bot.sendPhoto(
+          chatId,
+          flower.imageUrl,
+          caption: '''
 🌸 *${flower.name}*
 💬 ${flower.description}
 💰 ${flower.price} UZS
 ''',
-        parseMode: 'Markdown',
-        replyMarkup: InlineKeyboardMarkup(inlineKeyboard: [
-          [
-            InlineKeyboardButton(
-              text: '🛒 Add to Cart',
-              callbackData: 'add_${flower.id}',
-            ),
-          ],
-        ]),
-      );
+          parseMode: 'Markdown',
+          replyMarkup: InlineKeyboardMarkup(inlineKeyboard: [
+            [
+              InlineKeyboardButton(
+                text: '🛒 Add to Cart',
+                callbackData: 'add_${flower.id}',
+              ),
+            ],
+          ]),
+        );
+      } catch (e) {
+        print('❌ Failed to send photo for ${flower.name}: $e');
+        await bot.sendMessage(chatId, '⚠️ Could not load image for ${flower.name}');
+      }
+
     }
   });
 }
